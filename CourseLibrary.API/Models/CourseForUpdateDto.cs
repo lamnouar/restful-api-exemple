@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CourseLibrary.API.Models
 {
-    public class CourseForUpdteDto : CourseForManipulationDto
+    public class CourseForUpdateDto : CourseForManipulationDto
     {
         [Required]
         public override string Description

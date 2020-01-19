@@ -4,6 +4,7 @@ using AutoMapper;
 using CourseLibrary.API.Entities;
 using CourseLibrary.API.Models;
 using CourseLibrary.API.Services;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CourseLibrary.API.Controllers
@@ -68,7 +69,7 @@ namespace CourseLibrary.API.Controllers
         [HttpPut("{courseId}")]
         public IActionResult UpdateCourseForAuthor(Guid authorId,
                                                   Guid courseId,
-                                                  CourseForUpdteDto course)
+                                                  CourseForUpdateDto course)
         {
             if (!_courseLibraryRepository.AuthorExists(authorId))
                 return NotFound();
@@ -91,6 +92,29 @@ namespace CourseLibrary.API.Controllers
             }
 
             _mapper.Map(course, courseFromRepo);
+
+            _courseLibraryRepository.UpdateCourse(courseFromRepo);
+            _courseLibraryRepository.Save();
+
+            return NoContent();
+        }
+
+        [HttpPatch("{courseId}")]
+        public IActionResult PartiallyUpdateCourseForAuthor(Guid authorId,
+                                                            Guid courseId,
+                                                            JsonPatchDocument<CourseForUpdateDto> patchDocument)
+        {
+            if (!_courseLibraryRepository.AuthorExists(authorId))
+                return NotFound();
+
+            var courseFromRepo = _courseLibraryRepository.GetCourse(authorId, courseId);
+
+            if (courseFromRepo == null)
+                return NotFound();
+
+            var courseToPatch = _mapper.Map<CourseForUpdateDto>(courseFromRepo);
+            patchDocument.ApplyTo(courseToPatch); //TODO: addvalidation
+            _mapper.Map(courseToPatch, courseFromRepo);
 
             _courseLibraryRepository.UpdateCourse(courseFromRepo);
             _courseLibraryRepository.Save();
