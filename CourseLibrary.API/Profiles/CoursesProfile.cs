@@ -10,7 +10,7 @@ namespace CourseLibrary.API.Profiles
         {
             CreateMap<Course, CourseDto>();
             CreateMap<CourseForCreationDto, Course>();
-            CreateMap<CourseForUpdteDto, Course>();
+            CreateMap<CourseForUpdateDto, Course>().ReverseMap();
         }
     }
 }
